@@ -12,6 +12,12 @@ export class User {
   email?: string;
 
   @Field({ nullable: true })
+  userType?: string;
+
+  @Field()
+  companyId: number;
+
+  @Field({ nullable: true })
   avatarUrl?: string;
 
   @Field({ nullable: true })

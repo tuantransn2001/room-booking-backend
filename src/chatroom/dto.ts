@@ -7,6 +7,7 @@ export class CreateChatroomDto {
   @IsString()
   @IsNotEmpty({ message: 'Name is required.' })
   name: string;
+  
   @IsArray()
   @Field(() => [String])
   userIds: string[];

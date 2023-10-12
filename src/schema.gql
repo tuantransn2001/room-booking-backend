@@ -11,10 +11,32 @@ type Chatroom {
   users: [User!]
 }
 
+input CreateHotelDto {
+  categoryId: Float!
+  description: String!
+  hotelName: String!
+}
+
+input CreateRoomDto {
+  currentPrice: String!
+  description: String!
+  hotelId: Float!
+  roomName: String!
+  roomTypeId: Float!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+type Hotel {
+  categoryId: Float
+  description: String
+  hotelName: String
+  id: Float
+  rooms: [Room!]
+}
 
 input LoginDto {
   email: String!
@@ -37,7 +59,10 @@ type Message {
 
 type Mutation {
   addUsersToChatroom(chatroomId: Float!, userIds: [Float!]!): Chatroom!
+  bookRoom: Room!
   createChatroom(name: String!): Chatroom!
+  createHotel(createHotelInput: CreateHotelDto!): Hotel!
+  createRoom(createRoomInput: CreateRoomDto!): Room!
   deleteChatroom(chatroomId: Float!): String!
   enterChatroom(chatroomId: Float!): Boolean!
   leaveChatroom(chatroomId: Float!): Boolean!
@@ -51,23 +76,47 @@ type Mutation {
   userStoppedTypingMutation(chatroomId: Float!): User!
 }
 
+input PaginationDto {
+  page_number: Float!
+  page_size: Float!
+}
+
 type Query {
   getChatroomsForUser(userId: Float!): [Chatroom!]!
   getMessagesForChatroom(chatroomId: Float!): [Message!]!
+  getRoomTypes(paginationInput: PaginationDto!): [RoomType!]!
+  getRooms(paginationInput: PaginationDto!): [Room!]!
   getUsersOfChatroom(chatroomId: Float!): [User!]!
   hello: String!
   searchUsers(fullname: String!): [User!]!
 }
 
 input RegisterDto {
+  companyId: Float!
   confirmPassword: String!
   email: String!
   fullname: String!
   password: String!
+  userType: String
 }
 
 type RegisterResponse {
   user: User
+}
+
+type Room {
+  currentPrice: String!
+  description: String!
+  hotel: Hotel
+  hotelId: Float
+  id: Float
+  roomName: String
+}
+
+type RoomType {
+  description: String
+  id: Float
+  typeName: String
 }
 
 type Subscription {
@@ -82,10 +131,12 @@ scalar Upload
 
 type User {
   avatarUrl: String
+  companyId: Float!
   createdAt: DateTime
   email: String!
   fullname: String!
   id: Float
   password: String
   updatedAt: DateTime
+  userType: String
 }

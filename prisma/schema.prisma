@@ -7,6 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model User {
   id              Int             @id @default(autoincrement())
   fullname        String
@@ -14,12 +15,97 @@ model User {
   email           String          @unique
   emailVerifiedAt DateTime?
   password        String
+  userType        String?     
   rememberToken   String?
+  isActive        Boolean         @default(true)  
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
   chatrooms       Chatroom[]      @relation("ChatroomUsers")
   messages        Message[]
   ChatroomUsers   ChatroomUsers[]
+
+  companyId          Int
+  company            Company           @relation(fields: [companyId], references: [id] , onDelete: Cascade)
+}
+
+model Company {
+  id              Int             @id @default(autoincrement())
+  companyName     String
+  VAT_ID          String
+  email           String
+  emailVerifiedAt DateTime?
+  companyAddress  String
+  details         String
+  isActive        Boolean
+
+  cityId          Int
+  city            City           @relation(fields: [cityId], references: [id] , onDelete: Cascade)
+
+  invoiceCompanies  InvoiceCompany[]
+  companyPlans  CompanyPlan[]
+
+  users         User[]
+}
+
+model InvoiceCompany {
+  id              Int             @id @default(autoincrement())
+  
+  invoiceAmount   String
+  invoicePeriod   String
+  invoiceDetails  String
+
+  ts_issued       DateTime 
+  ts_paid         DateTime 
+  ts_cancel       DateTime 
+
+  companyId       Int
+  company         Company           @relation(fields: [companyId], references: [id] , onDelete: Cascade)
+}
+
+model Plan {
+  id            Int             @id @default(autoincrement())
+  planeName     String
+  details       String
+  roomMin       Int
+  roomMax       Int
+  monthlyPrice  String
+
+  companyPlans  CompanyPlan[]
+}
+
+model CompanyPlan {
+  id            Int             @id @default(autoincrement())
+  
+  ts_created    DateTime
+  ts_activated    DateTime
+  ts_deactivated    DateTime
+
+  
+  planId     Int
+  plan       Plan         @relation(fields: [planId], references: [id] , onDelete: Cascade)
+  
+  companyId     Int
+  company       Company         @relation(fields: [companyId], references: [id] , onDelete: Cascade)
+
+  companyPlanStatusEvents CompanyPlanStatusEvent[]
+}
+
+model CompanyPlanStatusEvent {
+  id            Int             @id @default(autoincrement())
+  
+  companyPlanId     Int
+  companyPlan       CompanyPlan         @relation(fields: [companyPlanId], references: [id] , onDelete: Cascade)
+  
+  companyPlanStatusCatalogId     Int
+  companyPlanStatusCatalog       CompanyPlanStatusCatalog         @relation(fields: [companyPlanStatusCatalogId], references: [id] , onDelete: Cascade)
+}
+
+model CompanyPlanStatusCatalog {
+  id            Int             @id @default(autoincrement())
+  statusName    String
+  isActive      Boolean
+
+  companyPlanStatusEvents CompanyPlanStatusEvent[]
 }
 
 model Chatroom {
@@ -53,4 +139,180 @@ model ChatroomUsers {
   chatroom   Chatroom @relation(fields: [chatroomId], references: [id], onDelete: Cascade)
 
   @@id([chatroomId, userId])
+}
+
+
+model Category {
+  id            Int      @id @default(autoincrement()) 
+  categoryName  String
+  hotels        Hotel[]  
+}
+
+model Hotel {
+  id          Int      @id @default(autoincrement())
+  hotelName   String      
+  description String?
+  isActive    Boolean?  @default(true)
+
+  categoryId  Int
+  category    Category @relation(fields: [categoryId], references: [id])
+
+  rooms       Room[]   
+}
+
+model RoomType {
+  id           Int      @id @default(autoincrement())
+  typeName     String 
+  description  String
+
+  rooms      Room[]   
+}
+
+model Room {
+  id           Int      @id @default(autoincrement())
+  roomName    String
+  description  String?
+
+  hotelId      Int
+  hotel        Hotel  @relation(fields: [hotelId], references: [id] , onDelete: Cascade)
+
+  roomTypeId   Int
+  roomType   RoomType @relation(fields: [roomTypeId], references: [id] , onDelete: Cascade)
+
+  roomReserves RoomReserved[]
+
+  currentPrice String
+  
+}
+
+model Country {
+  id           Int      @id @default(autoincrement())
+  countryName  String  
+
+  cities       City[]
+}
+
+model City {
+  id           Int      @id @default(autoincrement())
+  cityName     String
+  postCode     String
+
+  countryId    Int
+  country      Country @relation(fields: [countryId], references: [id] , onDelete: Cascade)
+
+  companies      Company[] 
+}
+
+model ReservationStatusCatalog {
+  id           Int      @id @default(autoincrement())
+  statusName   Int
+
+  reservationStatusEvents ReservationStatusEvent[]
+}
+
+model ReservationStatusEvent {
+  id           Int      @id @default(autoincrement())
+  details      String
+  ts_created   DateTime 
+
+  reservationId Int
+  reservation Reservation @relation(fields: [reservationId], references: [id] , onDelete: Cascade)
+
+  reservationStatusCatalogId Int
+  reservationStatusCatalog ReservationStatusCatalog @relation(fields: [reservationStatusCatalogId], references: [id] , onDelete: Cascade)
+}
+
+model Reservation {
+  id           Int      @id @default(autoincrement())
+
+  startDate    DateTime
+  endDate      DateTime
+
+  discountPercent String
+
+  totalPrice String
+
+  ts_created   DateTime 
+  ts_updated   DateTime 
+
+  guestId Int
+  guest Guest @relation(fields: [guestId], references: [id] , onDelete: Cascade)
+
+  reservationStatusEvents ReservationStatusEvent[]
+  roomReserves RoomReserved[]
+  syncronizations Syncronization[]
+  invoiceGuests   InvoiceGuest[]
+}
+
+model RoomReserved {
+  id           Int      @id @default(autoincrement())
+
+  price        String
+
+  reservationId Int
+  reservation Reservation @relation(fields: [reservationId], references: [id] , onDelete: Cascade)
+  
+  roomId Int
+  room Room @relation(fields: [roomId], references: [id] , onDelete: Cascade)
+}
+
+model Chanel {
+  id           Int      @id @default(autoincrement())
+  chanelName   String
+  details      String
+
+  chanelUses   ChanelUsed[]
+  syncronizations Syncronization[]
+}
+
+model ChanelUsed {
+  id           Int      @id @default(autoincrement())
+  roomId       Int      @unique
+  
+  chanelId Int
+  chanel Chanel @relation(fields: [chanelId], references: [id] , onDelete: Cascade)
+  
+}
+
+model Syncronization {
+  id               Int      @id @default(autoincrement())
+  messageSent      String
+  messageReceived  String
+
+  reservationId Int
+  reservation Reservation @relation(fields: [reservationId], references: [id] , onDelete: Cascade)
+
+  chanelId Int
+  chanel Chanel @relation(fields: [chanelId], references: [id] , onDelete: Cascade)
+
+  ts               DateTime
+}
+
+model Guest {
+  id               Int      @id @default(autoincrement())
+  firstName        String
+  lastName         String
+  email            String
+  phone            String
+  address          String
+  details          String
+
+  reservations     Reservation[] 
+  invoiceGuests     InvoiceGuest[]
+}
+
+model InvoiceGuest {
+  id               Int      @id @default(autoincrement())
+
+  invoiceAmount    String
+
+  ts_issued       DateTime 
+  ts_paid         DateTime 
+  ts_cancel       DateTime
+
+  reservationId Int
+  reservation Reservation @relation(fields: [reservationId], references: [id] , onDelete: Cascade)
+
+  guestId Int
+  guest Guest @relation(fields: [guestId], references: [id] , onDelete: Cascade)
 }

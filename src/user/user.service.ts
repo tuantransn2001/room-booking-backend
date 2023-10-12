@@ -6,7 +6,11 @@ import { join } from 'path';
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async updateProfile(userId: number, fullname: string, avatarUrl: string) {
+  public async updateProfile(
+    userId: number,
+    fullname: string,
+    avatarUrl: string,
+  ) {
     if (avatarUrl) {
       const oldUser = await this.prisma.user.findUnique({
         where: { id: userId },
@@ -43,7 +47,7 @@ export class UserService {
       },
     });
   }
-  async searchUsers(fullname: string, userId: number) {
+  public async searchUsers(fullname: string, userId: number) {
     // make sure that users are found that contain part of the fullname
     // and exclude the current user
     return this.prisma.user.findMany({
@@ -58,7 +62,7 @@ export class UserService {
     });
   }
 
-  async getUsersOfChatroom(chatroomId: number) {
+  public async getUsersOfChatroom(chatroomId: number) {
     return this.prisma.user.findMany({
       where: {
         chatrooms: {
@@ -73,7 +77,7 @@ export class UserService {
     });
   }
 
-  async getUser(userId: number) {
+  public async getUser(userId: number) {
     return this.prisma.user.findUnique({
       where: {
         id: userId,

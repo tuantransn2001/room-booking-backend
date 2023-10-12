@@ -133,7 +133,6 @@ export class ChatroomResolver {
   ) {
     return this.chatroomService.createChatroom(name, context.req.user.sub);
   }
-
   @Mutation(() => Chatroom)
   async addUsersToChatroom(
     @Args('chatroomId') chatroomId: number,
@@ -141,12 +140,10 @@ export class ChatroomResolver {
   ) {
     return this.chatroomService.addUsersToChatroom(chatroomId, userIds);
   }
-
   @Query(() => [Chatroom])
   async getChatroomsForUser(@Args('userId') userId: number) {
     return this.chatroomService.getChatroomsForUser(userId);
   }
-
   @Query(() => [Message])
   async getMessagesForChatroom(@Args('chatroomId') chatroomId: number) {
     return this.chatroomService.getMessagesForChatroom(chatroomId);

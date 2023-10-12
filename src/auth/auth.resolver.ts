@@ -42,12 +42,13 @@ export class AuthResolver {
   async hello() {
     return 'hello';
   }
+
   @Mutation(() => String)
   async refreshToken(@Context() context: { req: Request; res: Response }) {
     try {
       return this.authService.refreshToken(context.req, context.res);
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new BadRequestException(error);
     }
   }
 }

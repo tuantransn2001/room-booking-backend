@@ -13,7 +13,10 @@ export class LiveChatroomService {
     });
   }
 
-  async addLiveUserToChatroom(chatroomId: number, user: User): Promise<void> {
+  public async addLiveUserToChatroom(
+    chatroomId: number,
+    user: User,
+  ): Promise<void> {
     const existingLiveUsers = await this.getLiveUsersForChatroom(chatroomId);
 
     const existingUser = existingLiveUsers.find(
@@ -28,7 +31,7 @@ export class LiveChatroomService {
     );
   }
 
-  async removeLiveUserFromChatroom(
+  public async removeLiveUserFromChatroom(
     chatroomId: number,
     user: User,
   ): Promise<void> {
@@ -41,7 +44,7 @@ export class LiveChatroomService {
         console.log('removeLiveUserFromChatroom res', res);
       });
   }
-  async getLiveUsersForChatroom(chatroomId: number): Promise<User[]> {
+  public async getLiveUsersForChatroom(chatroomId: number): Promise<User[]> {
     const users = await this.redisClient.smembers(
       `liveUsers:chatroom:${chatroomId}`,
     );

@@ -18,7 +18,7 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async refreshToken(req: Request, res: Response) {
+  public async refreshToken(req: Request, res: Response) {
     const refreshToken = req.cookies['refresh_token'];
 
     if (!refreshToken) {
@@ -60,7 +60,7 @@ export class AuthService {
       { ...payload },
       {
         secret: this.configService.get<string>('ACCESS_TOKEN_SECRET'),
-        expiresIn: '150sec',
+        expiresIn: this.configService.get<string>('ACCESS_TOKEN_EXPIRES_IN'),
       },
     );
     const refreshToken = this.jwtService.sign(payload, {
@@ -75,7 +75,7 @@ export class AuthService {
     return { user };
   }
 
-  async validateUser(loginDto: LoginDto) {
+  public async validateUser(loginDto: LoginDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: loginDto.email },
     });
@@ -84,7 +84,7 @@ export class AuthService {
     }
     return null;
   }
-  async register(registerDto: RegisterDto, response: Response) {
+  public async register(registerDto: RegisterDto, response: Response) {
     const existingUser = await this.prisma.user.findUnique({
       where: { email: registerDto.email },
     });
@@ -92,17 +92,20 @@ export class AuthService {
       throw new BadRequestException({ email: 'Email already in use' });
     }
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+
     const user = await this.prisma.user.create({
       data: {
         fullname: registerDto.fullname,
         password: hashedPassword,
         email: registerDto.email,
+        companyId: registerDto.companyId,
+        userType: registerDto.userType ?? 'Guest',
       },
     });
     return this.issueTokens(user, response);
   }
 
-  async login(loginDto: LoginDto, response: Response) {
+  public async login(loginDto: LoginDto, response: Response) {
     const user = await this.validateUser(loginDto);
     if (!user) {
       throw new BadRequestException({

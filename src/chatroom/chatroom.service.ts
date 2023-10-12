@@ -10,7 +10,7 @@ export class ChatroomService {
     private readonly configService: ConfigService,
   ) {}
 
-  async getChatroom(id: string) {
+  public async getChatroom(id: string) {
     return this.prisma.chatroom.findUnique({
       where: {
         id: parseInt(id),
@@ -18,7 +18,7 @@ export class ChatroomService {
     });
   }
 
-  async createChatroom(name: string, sub: number) {
+  public async createChatroom(name: string, sub: number) {
     const existingChatroom = await this.prisma.chatroom.findFirst({
       where: {
         name,
@@ -39,7 +39,7 @@ export class ChatroomService {
     });
   }
 
-  async addUsersToChatroom(chatroomId: number, userIds: number[]) {
+  public async addUsersToChatroom(chatroomId: number, userIds: number[]) {
     const existingChatroom = await this.prisma.chatroom.findUnique({
       where: {
         id: chatroomId,
@@ -63,7 +63,7 @@ export class ChatroomService {
       },
     });
   }
-  async getChatroomsForUser(userId: number) {
+  public async getChatroomsForUser(userId: number) {
     return this.prisma.chatroom.findMany({
       where: {
         users: {
@@ -88,7 +88,7 @@ export class ChatroomService {
       },
     });
   }
-  async sendMessage(
+  public async sendMessage(
     chatroomId: number,
     message: string,
     userId: number,
@@ -112,7 +112,7 @@ export class ChatroomService {
     });
   }
 
-  async saveImage(image: {
+  public async saveImage(image: {
     createReadStream: () => any;
     filename: string;
     mimetype: string;
@@ -136,7 +136,7 @@ export class ChatroomService {
 
     return imagePath;
   }
-  async getMessagesForChatroom(chatroomId: number) {
+  public async getMessagesForChatroom(chatroomId: number) {
     return await this.prisma.message.findMany({
       where: {
         chatroomId: chatroomId,
@@ -156,7 +156,7 @@ export class ChatroomService {
     });
   }
 
-  async deleteChatroom(chatroomId: number) {
+  public async deleteChatroom(chatroomId: number) {
     return this.prisma.chatroom.delete({
       where: {
         id: chatroomId,
