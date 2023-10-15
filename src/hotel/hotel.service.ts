@@ -1,7 +1,13 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { PaginationDto } from 'src/common/dto/paginationDto';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateHotelDto, CreateRoomDto } from './dto';
+import { CreateHotelDto, CreateRoomDto, ReservationsDto } from './dto';
+import { PaginationDtoOutput } from 'src/common/dto/output/paginationDto';
+import { ReservationStatus } from './enum';
+import { ReservationType } from './reservation.type';
 
 @Injectable()
 export class HotelService {
@@ -21,6 +27,7 @@ export class HotelService {
         hotelName: createHotelDto.hotelName,
       },
     });
+
     if (existingChatroom) {
       throw new BadRequestException({ name: 'Hotel already exists' });
     }
@@ -46,20 +53,115 @@ export class HotelService {
     });
   }
 
-  public async getRooms(pagination: PaginationDto) {
+  public async getRooms(pagination: PaginationDtoOutput) {
     return await this.prisma.room.findMany({
-      include: {
-        hotel: true,
-      },
+      where: pagination.search,
       skip: pagination.page_number,
       take: pagination.page_size,
     });
   }
 
-  public async getRoomTypes(pagination: PaginationDto) {
-    return await this.prisma.roomType.findMany({
+  public async getCategories(pagination: PaginationDtoOutput) {
+    return await this.prisma.category.findMany({
+      where: pagination.search,
       skip: pagination.page_number,
       take: pagination.page_size,
     });
+  }
+
+  public async reservations(reservationsDto: ReservationsDto) {
+    const existRoom = await this.prisma.room.findUnique({
+      where: {
+        id: reservationsDto.roomId,
+      },
+      include: {
+        roomType: true,
+      },
+    });
+
+    if (!existRoom) return new NotFoundException('Room not found!');
+
+    const existingGuest = await this.prisma.guest.findUnique({
+      where: {
+        id: reservationsDto.guestId,
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    if (!existingGuest) return new NotFoundException('Guest not found!');
+
+    const reservations = await this.prisma.reservation.create({
+      data: {
+        startDate: reservationsDto.startDate,
+        endDate: reservationsDto.endDate,
+        discountPercent: reservationsDto.discountPercent,
+        totalPrice: existRoom.currentPrice,
+        ts_created: new Date(),
+        ts_updated: new Date(),
+        guestId: reservationsDto.guestId,
+      },
+    });
+
+    const provisionalReservationStatus =
+      await this.prisma.reservationStatusCatalog.findFirst({
+        where: {
+          statusName: ReservationStatus.Provisional,
+        },
+      });
+    const reservationStatusEvent =
+      await this.prisma.reservationStatusEvent.create({
+        data: {
+          details: 'Provisional',
+          ts_created: new Date(),
+          reservationId: reservations.id,
+          reservationStatusCatalogId: provisionalReservationStatus.id,
+        },
+      });
+
+    const roomReserved = await this.prisma.roomReserved.create({
+      data: {
+        reservationId: reservations.id,
+        roomId: reservationsDto.roomId,
+        price: `${
+          (+reservations.totalPrice * +reservationsDto.discountPercent) / 100
+        }`,
+      },
+    });
+
+    const chanel = await this.prisma.chanel.findFirst({
+      where: {
+        chanelName: 'AirBnb',
+      },
+    });
+
+    const syncronization = await this.prisma.syncronization.create({
+      data: {
+        messageSent: 'Reservation room success',
+        messageReceived: 'Reservation room success',
+        reservationId: reservations.id,
+        chanelId: chanel.id,
+        ts: new Date(),
+      },
+    });
+
+    const chanelUsed = await this.prisma.chanelUsed.create({
+      data: {
+        roomId: reservationsDto.roomId,
+        chanelId: chanel.id,
+      },
+    });
+
+    const response: ReservationType = {
+      checkin_date: reservations.startDate,
+      checkout_date: reservations.endDate,
+      room_type: existRoom.roomType.typeName,
+      guest_name: existingGuest.user.fullname,
+      guest_email: existingGuest.user.email,
+      additional_requests: '',
+    };
+
+    return response;
   }
 }

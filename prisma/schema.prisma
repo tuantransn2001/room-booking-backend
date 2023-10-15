@@ -24,8 +24,10 @@ model User {
   messages        Message[]
   ChatroomUsers   ChatroomUsers[]
 
-  companyId          Int
-  company            Company           @relation(fields: [companyId], references: [id] , onDelete: Cascade)
+  guest           Guest?
+
+  companyId       Int
+  company         Company         @relation(fields: [companyId], references: [id] , onDelete: Cascade)
 }
 
 model Company {
@@ -195,7 +197,7 @@ model Country {
 model City {
   id           Int      @id @default(autoincrement())
   cityName     String
-  postCode     String
+  postCode     Int
 
   countryId    Int
   country      Country @relation(fields: [countryId], references: [id] , onDelete: Cascade)
@@ -228,7 +230,7 @@ model Reservation {
   startDate    DateTime
   endDate      DateTime
 
-  discountPercent String
+  discountPercent Int
 
   totalPrice String
 
@@ -290,12 +292,11 @@ model Syncronization {
 
 model Guest {
   id               Int      @id @default(autoincrement())
-  firstName        String
-  lastName         String
-  email            String
-  phone            String
+  
   address          String
   details          String
+  userId Int @unique
+  user   User @relation(fields: [userId], references: [id])
 
   reservations     Reservation[] 
   invoiceGuests     InvoiceGuest[]
@@ -315,4 +316,9 @@ model InvoiceGuest {
 
   guestId Int
   guest Guest @relation(fields: [guestId], references: [id] , onDelete: Cascade)
+}
+
+model Image {
+  id   Int   @id @default(autoincrement())
+  data Bytes
 }

@@ -1,14 +1,14 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { PaginationDto } from '../dto/paginationDto';
+import { PaginationDtoOutput } from '../dto/output/paginationDto';
+import { URLSearchParam } from 'src/utils/urlSearchParam';
 
 export const GetPagination = createParamDecorator(
-  (data, ctx: ExecutionContext): PaginationDto => {
+  (data, ctx: ExecutionContext): PaginationDtoOutput => {
     const args = ctx.getArgByIndex(1);
-    const paginationParams: PaginationDto = {
+    const paginationParams: PaginationDtoOutput = {
       page_number: 0,
       page_size: 10,
-      // sort: [],
-      // search: [],
+      search: {},
     };
 
     const _limit = args.paginationInput.page_size;
@@ -42,18 +42,11 @@ export const GetPagination = createParamDecorator(
     //   });
     // }
 
-    // create array of search
-    // if (args.paginationInput.search) {
-    //   const searchArray = args.paginationInput.search.toString().split(',');
-    //   paginationParams.search = searchArray.map((searchItem) => {
-    //     const field = searchItem.split(':')[0];
-    //     const value = searchItem.split(':')[1];
-    //     return {
-    //       field,
-    //       value,
-    //     };
-    //   });
-    // }
+    if (args.paginationInput.search) {
+      paginationParams.search = URLSearchParam.urlParamsToObj(
+        args.paginationInput.search.toString(),
+      );
+    }
     return paginationParams;
   },
 );

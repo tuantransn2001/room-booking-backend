@@ -25,11 +25,8 @@ export class RegisterDto {
   @IsOptional()
   userType: string;
 
-  // confirm password must be the same as password
-
   @Field()
   @IsNotEmpty({ message: 'Confirm Password is required.' })
-  // must be the same as password
   confirmPassword: string;
 
   @Field()
