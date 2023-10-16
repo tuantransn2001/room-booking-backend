@@ -1,10 +1,10 @@
 import { InputType, Field } from '@nestjs/graphql';
+import { Transform } from 'class-transformer';
 import {
   IsNotEmpty,
   IsString,
   IsOptional,
   IsInt,
-  IsDateString,
   IsNumber,
 } from 'class-validator';
 
@@ -55,15 +55,6 @@ export class CreateRoomDto {
 }
 
 @InputType()
-export class BookRoomDto {
-  roomId: string;
-  startDate: Date;
-  endDate: Date;
-  discountPercent: number;
-  totalPrice: string;
-}
-
-@InputType()
 export class ReservationsDto {
   @Field()
   @IsNotEmpty({ message: 'RoomId is required.' })
@@ -75,14 +66,11 @@ export class ReservationsDto {
   @IsInt({ message: 'GuestId must be a string.' })
   guestId: number;
 
-  // @IsDateString({}, { each: true })
-
   @Field()
   @IsString()
   @IsNotEmpty({ message: 'StartDate is required.' })
   startDate: string;
 
-  // @IsDateString({}, { each: true })
   @Field()
   @IsString()
   @IsNotEmpty({ message: 'EndDate is required.' })
@@ -92,4 +80,11 @@ export class ReservationsDto {
   @IsOptional()
   @IsNumber()
   discountPercent?: number;
+}
+@InputType()
+export class GetHotelByIdDto {
+  @Field()
+  @IsNotEmpty({ message: 'id is required.' })
+  @IsNumber()
+  id: number;
 }
