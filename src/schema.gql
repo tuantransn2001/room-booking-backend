@@ -128,9 +128,9 @@ type ReservationType {
 input ReservationsDto {
   discountPercent: Float!
   endDate: String!
-  guestId: Float!
   roomId: Float!
   startDate: String!
+  userId: Float!
 }
 
 type Room {

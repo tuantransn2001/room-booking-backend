@@ -62,9 +62,9 @@ export class ReservationsDto {
   roomId: number;
 
   @Field()
-  @IsNotEmpty({ message: 'GuestId is required.' })
-  @IsInt({ message: 'GuestId must be a string.' })
-  guestId: number;
+  @IsNotEmpty({ message: 'UserId is required.' })
+  @IsInt({ message: 'UserId must be a string.' })
+  userId: number;
 
   @Field()
   @IsString()

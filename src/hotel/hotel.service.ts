@@ -97,18 +97,18 @@ export class HotelService {
       },
     });
 
-    if (!existRoom) return new NotFoundException('Room not found!');
+    if (!existRoom) throw new NotFoundException('Room not found!');
 
     const existingGuest = await this.prisma.guest.findUnique({
       where: {
-        id: reservationsDto.guestId,
+        userId: reservationsDto.userId,
       },
       include: {
         user: true,
       },
     });
 
-    if (!existingGuest) return new NotFoundException('Guest not found!');
+    if (!existingGuest) throw new NotFoundException('Guest not found!');
 
     const reservations = await this.prisma.reservation.create({
       data: {
@@ -118,7 +118,7 @@ export class HotelService {
         totalPrice: existRoom.currentPrice,
         ts_created: new Date(),
         ts_updated: new Date(),
-        guestId: reservationsDto.guestId,
+        guestId: existingGuest.id,
       },
     });
 
