@@ -44,7 +44,6 @@ const pubSub = new RedisPubSub({
       driver: ApolloDriver,
       useFactory: async (
         configService: ConfigService,
-
         tokenService: TokenService,
       ) => {
         return {
@@ -70,7 +69,7 @@ const pubSub = new RedisPubSub({
           },
           context: ({ req, res, connection }) => {
             if (connection) {
-              return { req, res, user: connection.context.user, pubSub }; // Injecting pubSub into context
+              return { req, res, user: connection.context.user, pubSub };
             }
             return { req, res };
           },

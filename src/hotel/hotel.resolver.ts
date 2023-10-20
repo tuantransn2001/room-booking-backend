@@ -4,7 +4,12 @@ import { GraphqlAuthGuard } from 'src/auth/graphql-auth.guard';
 import { GetPagination } from 'src/common/decorator/getPagination.decorator';
 import { PaginationDto } from 'src/common/dto/input/paginationDto';
 import { GraphQLErrorFilter } from 'src/filters/custom-exception.filter';
-import { CreateHotelDto, CreateRoomDto, ReservationsDto } from './dto';
+import {
+  CreateHotelDto,
+  CreateRoomDto,
+  GetHotelByIdDto,
+  ReservationsDto,
+} from './dto';
 import { HotelService } from './hotel.service';
 import { Hotel } from './hotel.type';
 import { Room } from './room.type';
@@ -56,11 +61,28 @@ export class HotelResolver {
   @UseFilters(GraphQLErrorFilter)
   @UseGuards(GraphqlAuthGuard)
   @Query(() => [Category], { name: 'getCategories' })
-  public async getRoomTypes(
-    @Args('paginationInput') paginationInput: PaginationDto,
-    @GetPagination() pagination: PaginationDtoOutput,
+  public async getRoomTypes() {
+    return await this.hotelService.getCategories();
+  }
+  /* -------------------------------------------------------------------------- */
+  /*                               Get Hotels                                   */
+  /* -------------------------------------------------------------------------- */
+  @UseFilters(GraphQLErrorFilter)
+  @UseGuards(GraphqlAuthGuard)
+  @Query(() => [Hotel], { name: 'getHotels' })
+  public async getHotels() {
+    return await this.hotelService.getHotels();
+  }
+  /* -------------------------------------------------------------------------- */
+  /*                            Get Hotels by Id                                */
+  /* -------------------------------------------------------------------------- */
+  @UseFilters(GraphQLErrorFilter)
+  @UseGuards(GraphqlAuthGuard)
+  @Query(() => Hotel, { name: 'getHotelById' })
+  public async getHotelById(
+    @Args('getHotelByIdInput') getHotelByIdDto: GetHotelByIdDto,
   ) {
-    return await this.hotelService.getCategories(pagination);
+    return await this.hotelService.getHotelById(getHotelByIdDto.id);
   }
   /* -------------------------------------------------------------------------- */
   /*                               Booking Room                                 */

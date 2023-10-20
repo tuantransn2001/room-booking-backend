@@ -35,6 +35,10 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+input GetHotelByIdDto {
+  id: Float!
+}
+
 type Hotel {
   categoryId: Float
   description: String
@@ -88,8 +92,10 @@ input PaginationDto {
 }
 
 type Query {
-  getCategories(paginationInput: PaginationDto!): [Category!]!
+  getCategories: [Category!]!
   getChatroomsForUser(userId: Float!): [Chatroom!]!
+  getHotelById(getHotelByIdInput: GetHotelByIdDto!): Hotel!
+  getHotels: [Hotel!]!
   getMessagesForChatroom(chatroomId: Float!): [Message!]!
   getRooms(paginationInput: PaginationDto!): [Room!]!
   getUsersOfChatroom(chatroomId: Float!): [User!]!
@@ -122,9 +128,9 @@ type ReservationType {
 input ReservationsDto {
   discountPercent: Float!
   endDate: String!
-  guestId: Float!
   roomId: Float!
   startDate: String!
+  userId: Float!
 }
 
 type Room {
@@ -134,6 +140,13 @@ type Room {
   hotelId: Float
   id: Float
   roomName: String
+  roomType: RoomType
+}
+
+type RoomType {
+  description: String
+  id: Float
+  typeName: String
 }
 
 type Subscription {

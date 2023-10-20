@@ -1,5 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Hotel } from './hotel.type';
+import { RoomType } from './roomType';
 
 @ObjectType()
 export class Room {
@@ -20,16 +21,7 @@ export class Room {
 
   @Field(() => Hotel, { nullable: true })
   hotel?: Hotel;
-}
 
-@ObjectType()
-export class RoomType {
-  @Field({ nullable: true })
-  id?: number;
-
-  @Field({ nullable: true })
-  typeName?: string;
-
-  @Field({ nullable: true })
-  description?: string;
+  @Field(() => RoomType, { nullable: true })
+  roomType?: RoomType;
 }

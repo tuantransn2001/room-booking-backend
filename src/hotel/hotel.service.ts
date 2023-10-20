@@ -61,12 +61,30 @@ export class HotelService {
     });
   }
 
-  public async getCategories(pagination: PaginationDtoOutput) {
-    return await this.prisma.category.findMany({
-      where: pagination.search,
-      skip: pagination.page_number,
-      take: pagination.page_size,
+  public async getCategories() {
+    return await this.prisma.category.findMany({});
+  }
+
+  public async getHotels() {
+    return await this.prisma.hotel.findMany({
+      include: {
+        rooms: true,
+      },
     });
+  }
+  public async getHotelById(id: number) {
+    const foundHotel = await this.prisma.hotel.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        rooms: {
+          include: { roomType: true, roomReserves: true },
+        },
+      },
+    });
+    if (!foundHotel) throw new NotFoundException('Hotel Not Found!');
+    return foundHotel;
   }
 
   public async reservations(reservationsDto: ReservationsDto) {
@@ -79,18 +97,18 @@ export class HotelService {
       },
     });
 
-    if (!existRoom) return new NotFoundException('Room not found!');
+    if (!existRoom) throw new NotFoundException('Room not found!');
 
     const existingGuest = await this.prisma.guest.findUnique({
       where: {
-        id: reservationsDto.guestId,
+        userId: reservationsDto.userId,
       },
       include: {
         user: true,
       },
     });
 
-    if (!existingGuest) return new NotFoundException('Guest not found!');
+    if (!existingGuest) throw new NotFoundException('Guest not found!');
 
     const reservations = await this.prisma.reservation.create({
       data: {
@@ -100,7 +118,7 @@ export class HotelService {
         totalPrice: existRoom.currentPrice,
         ts_created: new Date(),
         ts_updated: new Date(),
-        guestId: reservationsDto.guestId,
+        guestId: existingGuest.id,
       },
     });
 
