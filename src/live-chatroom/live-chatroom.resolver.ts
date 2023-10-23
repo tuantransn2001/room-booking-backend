@@ -30,7 +30,7 @@ export class LiveChatroomResolver {
   }
 
   @UseFilters(GraphQLErrorFilter)
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Mutation(() => Boolean)
   async enterChatroom(
     @Args('chatroomId') chatroomId: number,
@@ -56,7 +56,7 @@ export class LiveChatroomResolver {
   }
 
   @UseFilters(GraphQLErrorFilter)
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Mutation(() => Boolean)
   async leaveChatroom(
     @Args('chatroomId') chatroomId: number,

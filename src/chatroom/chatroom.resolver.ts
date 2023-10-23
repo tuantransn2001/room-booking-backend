@@ -65,7 +65,7 @@ export class ChatroomResolver {
   }
 
   @UseFilters(GraphQLErrorFilter)
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Mutation((returns) => User)
   async userStartedTypingMutation(
     @Args('chatroomId') chatroomId: number,
@@ -79,7 +79,7 @@ export class ChatroomResolver {
     return user;
   }
   @UseFilters(GraphQLErrorFilter)
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Mutation(() => User, {})
   async userStoppedTypingMutation(
     @Args('chatroomId') chatroomId: number,
@@ -95,7 +95,7 @@ export class ChatroomResolver {
     return user;
   }
 
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Mutation(() => Message)
   async sendMessage(
     @Args('chatroomId') chatroomId: number,
@@ -125,7 +125,7 @@ export class ChatroomResolver {
   }
 
   @UseFilters(GraphQLErrorFilter)
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Mutation(() => Chatroom)
   async createChatroom(
     @Args('name') name: string,

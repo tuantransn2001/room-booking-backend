@@ -1,11 +1,10 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { Transform } from 'class-transformer';
 import {
   IsNotEmpty,
   IsString,
   IsOptional,
-  IsInt,
   IsNumber,
+  IsBoolean,
 } from 'class-validator';
 
 @InputType()
@@ -21,8 +20,13 @@ export class CreateHotelDto {
   description: string;
 
   @Field()
+  @IsNotEmpty({ message: 'City is required.' })
+  @IsNumber()
+  cityId: number;
+
+  @Field()
   @IsNotEmpty({ message: 'Category is required.' })
-  @IsInt()
+  @IsNumber()
   categoryId: number;
 }
 
@@ -40,12 +44,12 @@ export class CreateRoomDto {
 
   @Field()
   @IsNotEmpty({ message: 'Hotel Own is required.' })
-  @IsInt()
+  @IsNumber()
   hotelId: number;
 
   @Field()
   @IsNotEmpty({ message: 'RoomType is required.' })
-  @IsInt()
+  @IsNumber()
   roomTypeId: number;
 
   @Field()
@@ -58,12 +62,12 @@ export class CreateRoomDto {
 export class ReservationsDto {
   @Field()
   @IsNotEmpty({ message: 'RoomId is required.' })
-  @IsInt({ message: 'RoomId must be a string.' })
+  @IsNumber()
   roomId: number;
 
   @Field()
   @IsNotEmpty({ message: 'UserId is required.' })
-  @IsInt({ message: 'UserId must be a string.' })
+  @IsNumber()
   userId: number;
 
   @Field()
@@ -87,4 +91,20 @@ export class GetHotelByIdDto {
   @IsNotEmpty({ message: 'id is required.' })
   @IsNumber()
   id: number;
+}
+
+@InputType()
+export class GetUserReservationByIdDto {
+  @Field()
+  @IsNotEmpty({ message: 'id is required.' })
+  @IsNumber()
+  userId: number;
+}
+
+@InputType()
+export class GetCountryDto {
+  @Field()
+  @IsOptional()
+  @IsBoolean()
+  all?: boolean;
 }

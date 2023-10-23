@@ -4,7 +4,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateHotelDto, CreateRoomDto, ReservationsDto } from './dto';
+import {
+  CreateHotelDto,
+  CreateRoomDto,
+  GetUserReservationByIdDto,
+  ReservationsDto,
+} from './dto';
 import { PaginationDtoOutput } from 'src/common/dto/output/paginationDto';
 import { ReservationStatus } from './enum';
 import { ReservationType } from './reservation.type';
@@ -65,11 +70,13 @@ export class HotelService {
     return await this.prisma.category.findMany({});
   }
 
-  public async getHotels() {
+  public async getHotels(pagination: PaginationDtoOutput) {
     return await this.prisma.hotel.findMany({
       include: {
         rooms: true,
       },
+      skip: pagination.page_number,
+      take: pagination.page_size,
     });
   }
   public async getHotelById(id: number) {
@@ -181,5 +188,56 @@ export class HotelService {
     };
 
     return response;
+  }
+
+  public async getUserReservations(
+    getUserReservationByIdDto: GetUserReservationByIdDto,
+  ) {
+    const existGuest = await this.prisma.user.findUnique({
+      where: {
+        id: getUserReservationByIdDto.userId,
+      },
+      include: {
+        guest: true,
+      },
+    });
+
+    if (!existGuest) throw new NotFoundException('Guest not found!');
+
+    const userReservations = await this.prisma.reservation.findMany({
+      where: {
+        guestId: existGuest.guest.id,
+      },
+      include: {
+        roomReserves: {
+          include: {
+            room: {
+              include: {
+                roomType: true,
+                hotel: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const response: ReservationType[] = userReservations.map((reservation) => ({
+      checkin_date: reservation.startDate,
+      checkout_date: reservation.endDate,
+      room_type: reservation.roomReserves[0].room.roomType.typeName,
+      guest_name: existGuest.fullname,
+      guest_email: existGuest.email,
+      additional_requests: '',
+    }));
+    return response;
+  }
+
+  public async getCountry(pagination: PaginationDtoOutput) {
+    return this.prisma.country.findMany({
+      where: pagination.search,
+      skip: pagination.page_number,
+      take: pagination.page_size,
+    });
   }
 }

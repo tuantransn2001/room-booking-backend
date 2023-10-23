@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("VIETNAME_PROVINICE_DATABASE_URL")
+}
+
+
+model AdministrativeRegion {
+  id          Int      @id @default(autoincrement())
+  name        String
+  name_en     String
+  code_name   String?
+  code_name_en String?
+  administrativeRegionProvinces   Province[]
+}
+
+model AdministrativeUnit {
+  id            Int       @id @default(autoincrement())
+  full_name     String?
+  full_name_en  String?
+  short_name    String?
+  short_name_en String?
+  code_name     String?
+  code_name_en  String?
+  administrativeUnitProvinces     Province[]
+  districts     District[]
+  wards         Ward[]
+}
+
+model Province {
+  code                  String    @id 
+  name                  String
+  name_en               String?
+  full_name             String
+  full_name_en          String?
+  code_name             String?
+  administrativeUnitId  Int?
+  administrativeRegionId Int?
+  administrativeUnit    AdministrativeUnit? @relation("provinceAdministrativeUnit", fields: [administrativeUnitId], references: [id])
+  administrativeRegion  AdministrativeRegion? @relation("provinceAdministrativeRegion", fields: [administrativeRegionId], references: [id])
+  districts             District[]
+}
+
+model District {
+  code               String   @id 
+  name               String
+  name_en            String?
+  full_name          String?
+  full_name_en       String?
+  code_name          String?
+  provinceCode       String?
+  administrativeUnitId Int?
+  province           Province @relation("districtProvince", fields: [provinceCode], references: [code])
+  administrativeUnit AdministrativeUnit? @relation("districtAdministrativeUnit", fields: [administrativeUnitId], references: [id])
+  wards              Ward[]
+}
+
+model Ward {
+  code               String   @id 
+  name               String
+  name_en            String?
+  full_name          String?
+  full_name_en       String?
+  code_name          String?
+  districtCode       String?
+  administrativeUnitId Int?
+  district           District @relation("wardDistrict", fields: [districtCode], references: [code])
+  administrativeUnit AdministrativeUnit? @relation("wardAdministrativeUnit", fields: [administrativeUnitId], references: [id])
+}

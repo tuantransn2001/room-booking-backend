@@ -160,6 +160,10 @@ model Hotel {
   category    Category @relation(fields: [categoryId], references: [id])
 
   rooms       Room[]   
+
+
+  cityId    Int
+  city      City @relation(fields: [cityId], references: [id] , onDelete: Cascade)
 }
 
 model RoomType {
@@ -197,12 +201,15 @@ model Country {
 model City {
   id           Int      @id @default(autoincrement())
   cityName     String
+  
   postCode     Int
 
   countryId    Int
   country      Country @relation(fields: [countryId], references: [id] , onDelete: Cascade)
 
-  companies      Company[] 
+  companies    Company[] 
+
+  hotels       Hotel[] 
 }
 
 model ReservationStatusCatalog {

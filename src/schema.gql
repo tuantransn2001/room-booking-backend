@@ -18,6 +18,7 @@ type Chatroom {
 
 input CreateHotelDto {
   categoryId: Float!
+  cityId: Float!
   description: String!
   hotelName: String!
 }
@@ -37,6 +38,10 @@ scalar DateTime
 
 input GetHotelByIdDto {
   id: Float!
+}
+
+input GetUserReservationByIdDto {
+  userId: Float!
 }
 
 type Hotel {
@@ -95,9 +100,10 @@ type Query {
   getCategories: [Category!]!
   getChatroomsForUser(userId: Float!): [Chatroom!]!
   getHotelById(getHotelByIdInput: GetHotelByIdDto!): Hotel!
-  getHotels: [Hotel!]!
+  getHotels(paginationInput: PaginationDto!): [Hotel!]!
   getMessagesForChatroom(chatroomId: Float!): [Message!]!
   getRooms(paginationInput: PaginationDto!): [Room!]!
+  getUserReservations(getUserReservationsInput: GetUserReservationByIdDto!): [ReservationType!]!
   getUsersOfChatroom(chatroomId: Float!): [User!]!
   hello: String!
   searchUsers(fullname: String!): [User!]!

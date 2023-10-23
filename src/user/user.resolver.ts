@@ -1,4 +1,3 @@
-
 import { Resolver, Query, Context, Mutation, Args } from '@nestjs/graphql';
 import { UserService } from './user.service';
 import { User } from './user.type';
@@ -13,7 +12,7 @@ import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Mutation(() => User)
   async updateProfile(
     @Args('fullname') fullname: string,
@@ -36,7 +35,7 @@ export class UserResolver {
     return imageUrl;
   }
 
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Query(() => [User])
   async searchUsers(
     @Args('fullname') fullname: string,
@@ -45,7 +44,7 @@ export class UserResolver {
     return this.userService.searchUsers(fullname, context.req.user.sub);
   }
 
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Query(() => [User])
   getUsersOfChatroom(@Args('chatroomId') chatroomId: number) {
     return this.userService.getUsersOfChatroom(chatroomId);

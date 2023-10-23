@@ -15,6 +15,8 @@ import { ChatroomModule } from './chatroom/chatroom.module';
 import { LiveChatroomModule } from './live-chatroom/live-chatroom.module';
 import { SeedModule } from './seed/seed.module';
 import { HotelModule } from './hotel/hotel.module';
+import { PaymentService } from './payment/payment.service';
+import { PaymentModule } from './payment/payment.module';
 const pubSub = new RedisPubSub({
   connection: {
     host: process.env.REDIS_HOST || 'localhost',
@@ -83,8 +85,9 @@ const pubSub = new RedisPubSub({
     LiveChatroomModule,
     HotelModule,
     SeedModule,
+    PaymentModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, PaymentService],
 })
 export class AppModule {}

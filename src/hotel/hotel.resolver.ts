@@ -7,7 +7,9 @@ import { GraphQLErrorFilter } from 'src/filters/custom-exception.filter';
 import {
   CreateHotelDto,
   CreateRoomDto,
+  GetCountryDto,
   GetHotelByIdDto,
+  GetUserReservationByIdDto,
   ReservationsDto,
 } from './dto';
 import { HotelService } from './hotel.service';
@@ -25,7 +27,7 @@ export class HotelResolver {
   /* hotel to describe the collection of rooms. Still, this could be a single apartment, motel, hostel, etc. */
   /* --------------------------------------------------------------------------------------------------------*/
   @UseFilters(GraphQLErrorFilter)
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Mutation(() => Hotel, { name: 'createHotel' })
   public async createHotel(
     @Args('createHotelInput') createHotelDto: CreateHotelDto,
@@ -36,7 +38,7 @@ export class HotelResolver {
   /*                               Create Room                                  */
   /* -------------------------------------------------------------------------- */
   @UseFilters(GraphQLErrorFilter)
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Mutation(() => Room, { name: 'createRoom' })
   public async createRoom(
     @Args('createRoomInput') createRoomDto: CreateRoomDto,
@@ -47,7 +49,7 @@ export class HotelResolver {
   /*                               Get Rooms                                    */
   /* -------------------------------------------------------------------------- */
   @UseFilters(GraphQLErrorFilter)
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Query(() => [Room], { name: 'getRooms' })
   public async getRooms(
     @Args('paginationInput') paginationInput: PaginationDto,
@@ -59,7 +61,7 @@ export class HotelResolver {
   /*                               Get Category                                 */
   /* -------------------------------------------------------------------------- */
   @UseFilters(GraphQLErrorFilter)
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Query(() => [Category], { name: 'getCategories' })
   public async getRoomTypes() {
     return await this.hotelService.getCategories();
@@ -68,16 +70,19 @@ export class HotelResolver {
   /*                               Get Hotels                                   */
   /* -------------------------------------------------------------------------- */
   @UseFilters(GraphQLErrorFilter)
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Query(() => [Hotel], { name: 'getHotels' })
-  public async getHotels() {
-    return await this.hotelService.getHotels();
+  public async getHotels(
+    @Args('paginationInput') paginationInput: PaginationDto,
+    @GetPagination() pagination: PaginationDtoOutput,
+  ) {
+    return await this.hotelService.getHotels(pagination);
   }
   /* -------------------------------------------------------------------------- */
   /*                            Get Hotels by Id                                */
   /* -------------------------------------------------------------------------- */
   @UseFilters(GraphQLErrorFilter)
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Query(() => Hotel, { name: 'getHotelById' })
   public async getHotelById(
     @Args('getHotelByIdInput') getHotelByIdDto: GetHotelByIdDto,
@@ -88,11 +93,34 @@ export class HotelResolver {
   /*                               Booking Room                                 */
   /* -------------------------------------------------------------------------- */
   @UseFilters(GraphQLErrorFilter)
-  @UseGuards(GraphqlAuthGuard)
+  // @UseGuards(GraphqlAuthGuard)
   @Mutation(() => ReservationType, { name: 'reservations' })
   public async reservations(
     @Args('reservationsInput') reservationsDto: ReservationsDto,
   ) {
     return await this.hotelService.reservations(reservationsDto);
+  }
+  /* -------------------------------------------------------------------------- */
+  /*                               Get Reservations                             */
+  /* -------------------------------------------------------------------------- */
+  @Query(() => [ReservationType], { name: 'getUserReservations' })
+  public async getUserReservations(
+    @Args('getUserReservationsInput')
+    getUserReservationByIdDto: GetUserReservationByIdDto,
+  ) {
+    return await this.hotelService.getUserReservations(
+      getUserReservationByIdDto,
+    );
+  }
+  /* -------------------------------------------------------------------------- */
+  /*                                  Get Country                               */
+  /* -------------------------------------------------------------------------- */
+  @Query(() => [ReservationType], { name: 'getUserReservations' })
+  public async getCountry(
+    @Args('paginationInput')
+    paginationInput: PaginationDto,
+    @GetPagination() pagination: PaginationDtoOutput,
+  ) {
+    return await this.hotelService.getCountry(pagination);
   }
 }
