@@ -1,13 +1,11 @@
 import { UseFilters, UseGuards } from '@nestjs/common';
 import { Resolver, Mutation, Args, Query } from '@nestjs/graphql';
-import { GraphqlAuthGuard } from 'src/auth/graphql-auth.guard';
 import { GetPagination } from 'src/common/decorator/getPagination.decorator';
 import { PaginationDto } from 'src/common/dto/input/paginationDto';
 import { GraphQLErrorFilter } from 'src/filters/custom-exception.filter';
 import {
   CreateHotelDto,
   CreateRoomDto,
-  GetCountryDto,
   GetHotelByIdDto,
   GetUserReservationByIdDto,
   ReservationsDto,
@@ -18,6 +16,8 @@ import { Room } from './room.type';
 import { Category } from './category.type';
 import { PaginationDtoOutput } from 'src/common/dto/output/paginationDto';
 import { ReservationType } from './reservation.type';
+import { GraphqlAuthGuard } from 'src/auth/graphql-auth.guard';
+import { Country } from './country.type';
 
 @Resolver()
 export class HotelResolver {
@@ -27,7 +27,7 @@ export class HotelResolver {
   /* hotel to describe the collection of rooms. Still, this could be a single apartment, motel, hostel, etc. */
   /* --------------------------------------------------------------------------------------------------------*/
   @UseFilters(GraphQLErrorFilter)
-  // @UseGuards(GraphqlAuthGuard)
+  @UseGuards(GraphqlAuthGuard)
   @Mutation(() => Hotel, { name: 'createHotel' })
   public async createHotel(
     @Args('createHotelInput') createHotelDto: CreateHotelDto,
@@ -38,7 +38,7 @@ export class HotelResolver {
   /*                               Create Room                                  */
   /* -------------------------------------------------------------------------- */
   @UseFilters(GraphQLErrorFilter)
-  // @UseGuards(GraphqlAuthGuard)
+  @UseGuards(GraphqlAuthGuard)
   @Mutation(() => Room, { name: 'createRoom' })
   public async createRoom(
     @Args('createRoomInput') createRoomDto: CreateRoomDto,
@@ -49,7 +49,7 @@ export class HotelResolver {
   /*                               Get Rooms                                    */
   /* -------------------------------------------------------------------------- */
   @UseFilters(GraphQLErrorFilter)
-  // @UseGuards(GraphqlAuthGuard)
+  @UseGuards(GraphqlAuthGuard)
   @Query(() => [Room], { name: 'getRooms' })
   public async getRooms(
     @Args('paginationInput') paginationInput: PaginationDto,
@@ -61,7 +61,7 @@ export class HotelResolver {
   /*                               Get Category                                 */
   /* -------------------------------------------------------------------------- */
   @UseFilters(GraphQLErrorFilter)
-  // @UseGuards(GraphqlAuthGuard)
+  @UseGuards(GraphqlAuthGuard)
   @Query(() => [Category], { name: 'getCategories' })
   public async getRoomTypes() {
     return await this.hotelService.getCategories();
@@ -70,7 +70,7 @@ export class HotelResolver {
   /*                               Get Hotels                                   */
   /* -------------------------------------------------------------------------- */
   @UseFilters(GraphQLErrorFilter)
-  // @UseGuards(GraphqlAuthGuard)
+  @UseGuards(GraphqlAuthGuard)
   @Query(() => [Hotel], { name: 'getHotels' })
   public async getHotels(
     @Args('paginationInput') paginationInput: PaginationDto,
@@ -82,7 +82,7 @@ export class HotelResolver {
   /*                            Get Hotels by Id                                */
   /* -------------------------------------------------------------------------- */
   @UseFilters(GraphQLErrorFilter)
-  // @UseGuards(GraphqlAuthGuard)
+  @UseGuards(GraphqlAuthGuard)
   @Query(() => Hotel, { name: 'getHotelById' })
   public async getHotelById(
     @Args('getHotelByIdInput') getHotelByIdDto: GetHotelByIdDto,
@@ -93,7 +93,7 @@ export class HotelResolver {
   /*                               Booking Room                                 */
   /* -------------------------------------------------------------------------- */
   @UseFilters(GraphQLErrorFilter)
-  // @UseGuards(GraphqlAuthGuard)
+  @UseGuards(GraphqlAuthGuard)
   @Mutation(() => ReservationType, { name: 'reservations' })
   public async reservations(
     @Args('reservationsInput') reservationsDto: ReservationsDto,
@@ -113,9 +113,9 @@ export class HotelResolver {
     );
   }
   /* -------------------------------------------------------------------------- */
-  /*                                  Get Country                               */
+  /*                                  Get Countries                             */
   /* -------------------------------------------------------------------------- */
-  @Query(() => [ReservationType], { name: 'getUserReservations' })
+  @Query(() => [Country], { name: 'getCountry' })
   public async getCountry(
     @Args('paginationInput')
     paginationInput: PaginationDto,

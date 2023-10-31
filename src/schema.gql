@@ -16,6 +16,11 @@ type Chatroom {
   users: [User!]
 }
 
+type Country {
+  countryName: String
+  id: String
+}
+
 input CreateHotelDto {
   categoryId: Float!
   cityId: Float!
@@ -99,6 +104,7 @@ input PaginationDto {
 type Query {
   getCategories: [Category!]!
   getChatroomsForUser(userId: Float!): [Chatroom!]!
+  getCountry(paginationInput: PaginationDto!): [Country!]!
   getHotelById(getHotelByIdInput: GetHotelByIdDto!): Hotel!
   getHotels(paginationInput: PaginationDto!): [Hotel!]!
   getMessagesForChatroom(chatroomId: Float!): [Message!]!

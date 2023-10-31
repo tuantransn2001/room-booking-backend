@@ -1,8 +1,7 @@
 import Stripe from 'stripe';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { RegisterCardDetailDto } from 'src/payment/dto';
 import { ConfigService } from '@nestjs/config';
-import { User } from 'src/user/user.type';
 
 @Injectable()
 export class StripeService {

@@ -234,7 +234,7 @@ export class HotelService {
   }
 
   public async getCountry(pagination: PaginationDtoOutput) {
-    return this.prisma.country.findMany({
+    return await this.prisma.country.findMany({
       where: pagination.search,
       skip: pagination.page_number,
       take: pagination.page_size,
