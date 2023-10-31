@@ -2,7 +2,6 @@ import { each as asyncForEach } from 'awaity/esm';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { UserRole } from 'src/user/enum';
-import { randomStringByCharsetAndLength } from 'src/utils/randomString';
 @Injectable()
 export class SeedService implements OnModuleInit {
   constructor(private readonly prisma: PrismaService) {}
